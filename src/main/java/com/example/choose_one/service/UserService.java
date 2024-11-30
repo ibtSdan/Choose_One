@@ -27,7 +27,6 @@ public class UserService {
         userRepository.save(entity);
 
         return "Sign-Up successful";
-
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
