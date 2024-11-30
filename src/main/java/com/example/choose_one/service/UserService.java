@@ -15,6 +15,11 @@ public class UserService {
     private final UserRepository userRepository;
 
     public String signUp(SignUpRequest signUpRequest) {
+        var user = userRepository.findByUserId(signUpRequest.getUserId());
+        if(user.isPresent()){ // userId 중복 방지
+            throw new RuntimeException("User already exists");
+        }
+
         var entity = UserEntity.builder()
                 .userId(signUpRequest.getUserId())
                 .password(signUpRequest.getPassword())

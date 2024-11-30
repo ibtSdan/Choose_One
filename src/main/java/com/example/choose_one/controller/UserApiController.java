@@ -26,7 +26,6 @@ public class UserApiController {
         return userService.signUp(signUpRequest);
     }
 
-
     // 로그인
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest){
