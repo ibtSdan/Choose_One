@@ -13,14 +13,14 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
-    public SignUpResponse signUp(SignUpRequest signUpRequest) {
+    public String signUp(SignUpRequest signUpRequest) {
         var entity = UserEntity.builder()
                 .userId(signUpRequest.getUserId())
                 .password(signUpRequest.getPassword())
                 .build();
         userRepository.save(entity);
 
-        return SignUpResponse.builder().id(entity.getId()).build();
+        return "Sign-Up successful";
 
     }
 }

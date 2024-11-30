@@ -20,7 +20,7 @@ public class UserApiController {
 
     // 회원가입
     @PostMapping("/signup")
-    public SignUpResponse signUp(@RequestBody SignUpRequest signUpRequest){
+    public String signUp(@RequestBody SignUpRequest signUpRequest){
         return userService.signUp(signUpRequest);
     }
 
