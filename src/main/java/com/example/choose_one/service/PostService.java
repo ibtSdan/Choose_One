@@ -1,5 +1,6 @@
 package com.example.choose_one.service;
 
+import com.example.choose_one.common.Api;
 import com.example.choose_one.common.ApiPagination;
 import com.example.choose_one.common.Pagination;
 import com.example.choose_one.entity.PostEntity;
@@ -10,10 +11,13 @@ import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +28,10 @@ public class PostService {
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
 
-    public String create(PostRequest postRequest) {
+    public Api<String> create(PostRequest postRequest) {
         var user = userRepository.findById(postRequest.getUserId())
                 .orElseThrow(() -> {
-                    return new RuntimeException("Not Found User");
+                    return new NoSuchElementException("해당하는 User가 존재하지 않습니다.");
                 });
 
         var entity = PostEntity.builder()
@@ -37,50 +41,46 @@ public class PostService {
                 .contentB(postRequest.getContentB())
                 .build();
         postRepository.save(entity);
-        return "Post successfully created";
+        return Api.<String>builder()
+                .resultCode(String.valueOf(HttpStatus.OK.value()))
+                .resultMessage(HttpStatus.OK.getReasonPhrase())
+                .data("글 작성 완료")
+                .build();
     }
 
-    public ViewResponse view(Long postId) {
+    public Api<ViewResponse> view(Long postId) {
         var entity = postRepository.findById(postId)
                 .orElseThrow(() -> {
-                    return new RuntimeException("Not Found Post");
+                    return new NoSuchElementException("해당하는 Post가 존재하지 않습니다.");
                 });
-        return ViewResponse.builder()
+
+        var data = ViewResponse.builder()
                 .title(entity.getTitle())
                 .contentA(entity.getContentA())
                 .contentB(entity.getContentB())
                 .countA(voteRepository.countByPostIdAndVoteOption(postId, 'A'))
                 .countB(voteRepository.countByPostIdAndVoteOption(postId, 'B'))
                 .build();
+
+        return Api.<ViewResponse>builder()
+                .resultCode(String.valueOf(HttpStatus.OK.value()))
+                .resultMessage(HttpStatus.OK.getReasonPhrase())
+                .data(data)
+                .build();
     }
 
-    public ApiPagination<List<PostAllResponse>> all(Pageable pageable) {
+    public Api<ApiPagination<List<PostAllResponse>>> all(Pageable pageable) {
         var list = postRepository.findAll(pageable);
-        var pagination = Pagination.builder()
-                .page(list.getNumber())
-                .size(list.getSize())
-                .currentElements(list.getNumberOfElements())
-                .totalPage(list.getTotalPages())
-                .totalElements(list.getTotalElements())
-                .build();
-        var body = list.toList().stream()
-                .map(it -> {
-                    return PostAllResponse.builder()
-                            .postId(it.getId())
-                            .title(it.getTitle())
-                            .contentA(it.getContentA())
-                            .contentB(it.getContentB())
-                            .totalVotes(voteRepository.countByPostId(it.getId()))
-                            .build();
-                }).toList();
-        return ApiPagination.<List<PostAllResponse>>builder()
-                .body(body)
-                .pagination(pagination)
-                .build();
+        return getApiPaginationApi(list);
     }
 
-    public ApiPagination<List<PostAllResponse>> userPost(Long userId, Pageable pageable) {
+    public Api<ApiPagination<List<PostAllResponse>>> userPost(Long userId, Pageable pageable) {
         var list = postRepository.findByUserId(userId,pageable);
+        return getApiPaginationApi(list);
+    }
+
+    private Api<ApiPagination<List<PostAllResponse>>> getApiPaginationApi(Page<PostEntity> list) {
+        // pagination
         var pagination = Pagination.builder()
                 .page(list.getNumber())
                 .size(list.getSize())
@@ -98,9 +98,14 @@ public class PostService {
                             .totalVotes(voteRepository.countByPostId(it.getId()))
                             .build();
                 }).toList();
-        return ApiPagination.<List<PostAllResponse>>builder()
-                .body(body)
-                .pagination(pagination)
+
+        return Api.<ApiPagination<List<PostAllResponse>>>builder()
+                .resultCode(String.valueOf(HttpStatus.OK.value()))
+                .resultMessage(HttpStatus.OK.getReasonPhrase())
+                .data(ApiPagination.<List<PostAllResponse>>builder()
+                        .body(body)
+                        .pagination(pagination)
+                        .build())
                 .build();
     }
 }

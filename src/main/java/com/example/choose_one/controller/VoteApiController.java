@@ -1,5 +1,6 @@
 package com.example.choose_one.controller;
 
+import com.example.choose_one.common.Api;
 import com.example.choose_one.model.VoteRequest;
 import com.example.choose_one.service.VoteService;
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ public class VoteApiController {
     private final VoteService voteService;
 
     @PostMapping("/create")
-    public String create(@Valid @RequestBody VoteRequest voteRequest){
+    public Api<String> create(@Valid @RequestBody VoteRequest voteRequest){
         return voteService.create(voteRequest);
     }
 
