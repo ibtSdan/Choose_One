@@ -1,5 +1,7 @@
 package com.example.choose_one.service;
 
+import com.example.choose_one.common.ApiPagination;
+import com.example.choose_one.common.Pagination;
 import com.example.choose_one.entity.PostEntity;
 import com.example.choose_one.model.ViewResponse;
 import com.example.choose_one.model.PostAllResponse;
@@ -8,6 +10,7 @@ import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,8 +54,16 @@ public class PostService {
                 .build();
     }
 
-    public List<PostAllResponse> all() {
-        return postRepository.findAll().stream()
+    public ApiPagination<List<PostAllResponse>> all(Pageable pageable) {
+        var list = postRepository.findAll(pageable);
+        var pagination = Pagination.builder()
+                .page(list.getNumber())
+                .size(list.getSize())
+                .currentElements(list.getNumberOfElements())
+                .totalPage(list.getTotalPages())
+                .totalElements(list.getTotalElements())
+                .build();
+        var body = list.toList().stream()
                 .map(it -> {
                     return PostAllResponse.builder()
                             .postId(it.getId())
@@ -62,10 +73,22 @@ public class PostService {
                             .totalVotes(voteRepository.countByPostId(it.getId()))
                             .build();
                 }).toList();
+        return ApiPagination.<List<PostAllResponse>>builder()
+                .body(body)
+                .pagination(pagination)
+                .build();
     }
 
-    public List<PostAllResponse> userPost(Long userId) {
-        return postRepository.findByUserId(userId).stream()
+    public ApiPagination<List<PostAllResponse>> userPost(Long userId, Pageable pageable) {
+        var list = postRepository.findByUserId(userId,pageable);
+        var pagination = Pagination.builder()
+                .page(list.getNumber())
+                .size(list.getSize())
+                .currentElements(list.getNumberOfElements())
+                .totalPage(list.getTotalPages())
+                .totalElements(list.getTotalElements())
+                .build();
+        var body = list.toList().stream()
                 .map(it -> {
                     return PostAllResponse.builder()
                             .postId(it.getId())
@@ -75,5 +98,9 @@ public class PostService {
                             .totalVotes(voteRepository.countByPostId(it.getId()))
                             .build();
                 }).toList();
+        return ApiPagination.<List<PostAllResponse>>builder()
+                .body(body)
+                .pagination(pagination)
+                .build();
     }
 }
