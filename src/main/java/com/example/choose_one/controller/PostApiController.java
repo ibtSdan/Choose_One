@@ -1,11 +1,15 @@
 package com.example.choose_one.controller;
 
+import com.example.choose_one.common.ApiPagination;
 import com.example.choose_one.model.ViewResponse;
 import com.example.choose_one.model.PostAllResponse;
 import com.example.choose_one.model.PostRequest;
 import com.example.choose_one.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,13 +36,17 @@ public class PostApiController {
 
     // 모든 글 조회
     @GetMapping("/all")
-    public List<PostAllResponse> all(){
-        return postService.all();
+    public ApiPagination<List<PostAllResponse>> all(
+            @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.DESC)Pageable pageable
+            ){
+        return postService.all(pageable);
     }
 
     // 특정 유저 글 조회
     @GetMapping("/view/{userId}")
-    public List<PostAllResponse> userPost(@PathVariable Long userId){
-        return postService.userPost(userId);
+    public ApiPagination<List<PostAllResponse>> userPost(
+            @PathVariable Long userId,
+            @PageableDefault(page = 0, size = 5, sort = "id",direction = Sort.Direction.DESC)Pageable pageable){
+        return postService.userPost(userId,pageable);
     }
 }
