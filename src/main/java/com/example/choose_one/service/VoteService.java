@@ -25,6 +25,11 @@ public class VoteService {
                     return new RuntimeException("Not Found Post");
                 });
 
+        var alreadyVoted = voteRepository.existsByUserIdAndPostId(user.getId(), post.getId());
+        if(alreadyVoted){
+            throw new RuntimeException("중복 투표 허용되지 않습니다.");
+        }
+
         var entity = VoteEntity.builder()
                 .user(user)
                 .post(post)
