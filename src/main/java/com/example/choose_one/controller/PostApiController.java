@@ -1,11 +1,14 @@
 package com.example.choose_one.controller;
 
 import com.example.choose_one.model.GetPostDetail;
+import com.example.choose_one.model.PostAllResponse;
 import com.example.choose_one.model.PostRequest;
 import com.example.choose_one.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/post")
@@ -28,6 +31,10 @@ public class PostApiController {
     }
 
     // 모든 글 조회
+    @GetMapping("/all")
+    public List<PostAllResponse> all(){
+        return postService.all();
+    }
 
     // 특정 유저 글 조회
 }

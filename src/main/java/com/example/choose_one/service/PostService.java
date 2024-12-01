@@ -2,11 +2,15 @@ package com.example.choose_one.service;
 
 import com.example.choose_one.entity.PostEntity;
 import com.example.choose_one.model.GetPostDetail;
+import com.example.choose_one.model.PostAllResponse;
 import com.example.choose_one.model.PostRequest;
 import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,5 +46,19 @@ public class PostService {
                 .contentA(entity.getContentA())
                 .contentB(entity.getContentB())
                 .build();
+    }
+
+    public List<PostAllResponse> all() {
+        return postRepository.findAll().stream()
+                .map(it -> {
+                    var totalVotes = it.getVoteList().size();
+                    return PostAllResponse.builder()
+                            .postId(it.getId())
+                            .title(it.getTitle())
+                            .contentA(it.getContentA())
+                            .contentB(it.getContentB())
+                            .totalVotes(totalVotes)
+                            .build();
+                }).toList();
     }
 }
