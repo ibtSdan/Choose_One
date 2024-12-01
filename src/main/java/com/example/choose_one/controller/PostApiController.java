@@ -1,6 +1,6 @@
 package com.example.choose_one.controller;
 
-import com.example.choose_one.model.GetPostDetail;
+import com.example.choose_one.model.ViewResponse;
 import com.example.choose_one.model.PostAllResponse;
 import com.example.choose_one.model.PostRequest;
 import com.example.choose_one.service.PostService;
@@ -26,7 +26,7 @@ public class PostApiController {
 
     // 특정 글 조회
     @GetMapping("/{postId}")
-    public GetPostDetail view(@PathVariable Long postId){
+    public ViewResponse view(@PathVariable Long postId){
         return postService.view(postId);
     }
 

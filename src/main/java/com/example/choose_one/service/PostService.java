@@ -1,7 +1,7 @@
 package com.example.choose_one.service;
 
 import com.example.choose_one.entity.PostEntity;
-import com.example.choose_one.model.GetPostDetail;
+import com.example.choose_one.model.ViewResponse;
 import com.example.choose_one.model.PostAllResponse;
 import com.example.choose_one.model.PostRequest;
 import com.example.choose_one.repository.PostRepository;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,12 +35,12 @@ public class PostService {
         return "Post successfully created";
     }
 
-    public GetPostDetail view(Long postId) {
+    public ViewResponse view(Long postId) {
         var entity = postRepository.findById(postId)
                 .orElseThrow(() -> {
                     return new RuntimeException("Not Found Post");
                 });
-        return GetPostDetail.builder()
+        return ViewResponse.builder()
                 .title(entity.getTitle())
                 .contentA(entity.getContentA())
                 .contentB(entity.getContentB())
