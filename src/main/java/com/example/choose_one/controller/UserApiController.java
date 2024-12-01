@@ -1,5 +1,6 @@
 package com.example.choose_one.controller;
 
+import com.example.choose_one.common.Api;
 import com.example.choose_one.model.LoginRequest;
 import com.example.choose_one.model.LoginResponse;
 import com.example.choose_one.model.SignUpRequest;
@@ -22,13 +23,13 @@ public class UserApiController {
 
     // 회원가입
     @PostMapping("/signup")
-    public String signUp(@Valid @RequestBody SignUpRequest signUpRequest){
+    public Api<String> signUp(@Valid @RequestBody SignUpRequest signUpRequest){
         return userService.signUp(signUpRequest);
     }
 
     // 로그인
     @PostMapping("/login")
-    public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest){
+    public Api<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest){
         return userService.login(loginRequest);
     }
 }
