@@ -16,6 +16,6 @@ public class ViewResponse {
     private String title;
     private String contentA;
     private String contentB;
-    private Integer countA;
-    private Integer countB;
+    private Long countA;
+    private Long countB;
 }
