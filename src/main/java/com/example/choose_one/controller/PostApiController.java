@@ -37,4 +37,8 @@ public class PostApiController {
     }
 
     // 특정 유저 글 조회
+    @GetMapping("/view/{userId}")
+    public List<PostAllResponse> userPost(@PathVariable Long userId){
+        return postService.userPost(userId);
+    }
 }

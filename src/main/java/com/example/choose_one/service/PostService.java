@@ -63,4 +63,17 @@ public class PostService {
                             .build();
                 }).toList();
     }
+
+    public List<PostAllResponse> userPost(Long userId) {
+        return postRepository.findByUserId(userId).stream()
+                .map(it -> {
+                    return PostAllResponse.builder()
+                            .postId(it.getId())
+                            .title(it.getTitle())
+                            .contentA(it.getContentA())
+                            .contentB(it.getContentB())
+                            .totalVotes(voteRepository.countByPostId(it.getId()))
+                            .build();
+                }).toList();
+    }
 }
