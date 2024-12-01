@@ -12,8 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GetPostDetail {
+public class ViewResponse {
     private String title;
     private String contentA;
     private String contentB;
+    private Long countA;
+    private Long countB;
 }
