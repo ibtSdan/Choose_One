@@ -2,18 +2,18 @@ package com.example.choose_one.model;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GetPostDetail {
+
+public class PostAllResponse {
+    private Long postId;
     private String title;
     private String contentA;
     private String contentB;
+    private Integer totalVotes;
 }
