@@ -15,5 +15,5 @@ public class PostAllResponse {
     private String title;
     private String contentA;
     private String contentB;
-    private Integer totalVotes;
+    private Long totalVotes;
 }
