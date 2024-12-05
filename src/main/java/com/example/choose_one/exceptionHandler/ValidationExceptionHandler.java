@@ -1,7 +1,7 @@
 package com.example.choose_one.exceptionHandler;
 
-import com.example.choose_one.common.Api;
-import jakarta.validation.ValidationException;
+import com.example.choose_one.common.api.Api;
+import com.example.choose_one.common.error.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -23,15 +23,10 @@ public class ValidationExceptionHandler {
                     var format = "%s : %s는 %s";
                     return String.format(format,it.getField(),it.getRejectedValue(),it.getDefaultMessage());
                 }).toList();
-        var error = Api.Error.builder()
-                .errorMessage(errorList)
-                .build();
-        var response = Api.builder()
-                .resultCode(String.valueOf(HttpStatus.BAD_REQUEST.value()))
-                .resultMessage(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .error(error)
-                .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Api.ERROR(ErrorCode.BAD_REQUEST,String.join(", ",errorList)));
 
     }
 }

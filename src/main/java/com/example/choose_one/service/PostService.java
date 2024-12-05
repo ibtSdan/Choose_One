@@ -1,8 +1,11 @@
 package com.example.choose_one.service;
 
-import com.example.choose_one.common.Api;
-import com.example.choose_one.common.ApiPagination;
-import com.example.choose_one.common.Pagination;
+import com.example.choose_one.common.api.Api;
+import com.example.choose_one.common.api.ApiPagination;
+import com.example.choose_one.common.api.Pagination;
+import com.example.choose_one.common.error.PostErrorCode;
+import com.example.choose_one.common.error.UserErrorCode;
+import com.example.choose_one.common.exception.ApiException;
 import com.example.choose_one.entity.PostEntity;
 import com.example.choose_one.model.ViewResponse;
 import com.example.choose_one.model.PostAllResponse;
@@ -13,11 +16,8 @@ import com.example.choose_one.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class PostService {
     public Api<String> create(PostRequest postRequest) {
         var user = userRepository.findById(postRequest.getUserId())
                 .orElseThrow(() -> {
-                    return new NoSuchElementException("해당하는 User가 존재하지 않습니다.");
+                    return new ApiException(UserErrorCode.USER_NOT_FOUND, "올바른 user id를 입력하십시오.");
                 });
 
         var entity = PostEntity.builder()
@@ -41,17 +41,13 @@ public class PostService {
                 .contentB(postRequest.getContentB())
                 .build();
         postRepository.save(entity);
-        return Api.<String>builder()
-                .resultCode(String.valueOf(HttpStatus.OK.value()))
-                .resultMessage(HttpStatus.OK.getReasonPhrase())
-                .data("글 작성 완료")
-                .build();
+        return Api.OK("글 작성 완료");
     }
 
     public Api<ViewResponse> view(Long postId) {
         var entity = postRepository.findById(postId)
                 .orElseThrow(() -> {
-                    return new NoSuchElementException("해당하는 Post가 존재하지 않습니다.");
+                    return new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.");
                 });
 
         var data = ViewResponse.builder()
@@ -62,11 +58,7 @@ public class PostService {
                 .countB(voteRepository.countByPostIdAndVoteOption(postId, 'B'))
                 .build();
 
-        return Api.<ViewResponse>builder()
-                .resultCode(String.valueOf(HttpStatus.OK.value()))
-                .resultMessage(HttpStatus.OK.getReasonPhrase())
-                .data(data)
-                .build();
+        return Api.OK(data);
     }
 
     public Api<ApiPagination<List<PostAllResponse>>> all(Pageable pageable) {
@@ -98,14 +90,10 @@ public class PostService {
                             .totalVotes(voteRepository.countByPostId(it.getId()))
                             .build();
                 }).toList();
-
-        return Api.<ApiPagination<List<PostAllResponse>>>builder()
-                .resultCode(String.valueOf(HttpStatus.OK.value()))
-                .resultMessage(HttpStatus.OK.getReasonPhrase())
-                .data(ApiPagination.<List<PostAllResponse>>builder()
-                        .body(body)
-                        .pagination(pagination)
-                        .build())
+        var response = ApiPagination.<List<PostAllResponse>>builder()
+                .body(body)
+                .pagination(pagination)
                 .build();
+        return Api.OK(response);
     }
 }

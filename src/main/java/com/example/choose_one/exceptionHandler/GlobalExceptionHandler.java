@@ -1,6 +1,7 @@
 package com.example.choose_one.exceptionHandler;
 
-import com.example.choose_one.common.Api;
+import com.example.choose_one.common.api.Api;
+import com.example.choose_one.common.error.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -18,15 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = { Exception.class})
     public ResponseEntity<Api> globalExceptionHandler(Exception e){
         log.error(""+e);
-        var errorList = List.of(e.getMessage());
-        var error = Api.Error.builder()
-                .errorMessage(errorList)
-                .build();
-        var response = Api.builder()
-                .resultCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                .resultMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .error(error)
-                .build();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Api.ERROR(ErrorCode.SERVER_ERROR, "서버 에러 발생"));
     }
 }
