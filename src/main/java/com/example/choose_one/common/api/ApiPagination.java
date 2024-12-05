@@ -1,4 +1,4 @@
-package com.example.choose_one.common;
+package com.example.choose_one.common.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
