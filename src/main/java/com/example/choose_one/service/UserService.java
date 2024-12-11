@@ -4,21 +4,20 @@ import com.example.choose_one.common.api.Api;
 import com.example.choose_one.common.error.UserErrorCode;
 import com.example.choose_one.common.exception.ApiException;
 import com.example.choose_one.entity.UserEntity;
-import com.example.choose_one.model.LoginRequest;
-import com.example.choose_one.model.LoginResponse;
-import com.example.choose_one.model.SignUpRequest;
+import com.example.choose_one.model.token.TokenResponse;
+import com.example.choose_one.model.user.LoginRequest;
+import com.example.choose_one.model.user.LoginResponse;
+import com.example.choose_one.model.user.SignUpRequest;
 import com.example.choose_one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
 
 public class UserService {
     private final UserRepository userRepository;
+    private final TokenService tokenService;
 
     public Api<String> signUp(SignUpRequest signUpRequest) {
         var user = userRepository.findByUserId(signUpRequest.getUserId());
@@ -35,7 +34,7 @@ public class UserService {
         return Api.OK("회원가입 되었습니다.");
     }
 
-    public Api<LoginResponse> login(LoginRequest loginRequest) {
+    public Api<TokenResponse> login(LoginRequest loginRequest) {
         // 사용자 이름 검증
         // 비밀번호 일치 확인
         // 해당 user id 반환
@@ -49,8 +48,18 @@ public class UserService {
                 }).orElseThrow(() -> {
                     return new ApiException(UserErrorCode.USER_NOT_FOUND, "올바른 id를 입력하십시오.");
                 });
-        return Api.OK(LoginResponse.builder()
-                .id(entity.getId())
-                .build());
+
+        var userId = entity.getId();
+        var accessToken = tokenService.issueAccessToken(userId);
+        var refreshToken = tokenService.issueRefreshToken(userId);
+
+        var response = TokenResponse.builder()
+                .accessToken(accessToken.getToken())
+                .accessTokenExpiredAt(accessToken.getExpiredAt())
+                .refreshToken(refreshToken.getToken())
+                .refreshTokenExpiredAt(refreshToken.getExpiredAt())
+                .build();
+
+        return Api.OK(response);
     }
 }
