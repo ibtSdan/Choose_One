@@ -11,6 +11,10 @@ import com.example.choose_one.model.user.SignUpRequest;
 import com.example.choose_one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +65,11 @@ public class UserService {
                 .build();
 
         return Api.OK(response);
+    }
+
+    public Api<String> me() {
+        var requestContext = Objects.requireNonNull(RequestContextHolder.getRequestAttributes());
+        var userId = requestContext.getAttribute("userId", RequestAttributes.SCOPE_REQUEST);
+        return Api.OK("토큰 검증 완료"+userId);
     }
 }
