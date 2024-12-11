@@ -1,4 +1,4 @@
-package com.example.choose_one.model;
+package com.example.choose_one.model.post;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

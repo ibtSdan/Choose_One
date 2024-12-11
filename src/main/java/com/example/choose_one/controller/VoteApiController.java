@@ -1,7 +1,7 @@
 package com.example.choose_one.controller;
 
 import com.example.choose_one.common.api.Api;
-import com.example.choose_one.model.VoteRequest;
+import com.example.choose_one.model.vote.VoteRequest;
 import com.example.choose_one.service.VoteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

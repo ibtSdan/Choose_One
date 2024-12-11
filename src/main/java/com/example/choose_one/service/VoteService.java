@@ -6,7 +6,7 @@ import com.example.choose_one.common.error.UserErrorCode;
 import com.example.choose_one.common.error.VoteErrorCode;
 import com.example.choose_one.common.exception.ApiException;
 import com.example.choose_one.entity.VoteEntity;
-import com.example.choose_one.model.VoteRequest;
+import com.example.choose_one.model.vote.VoteRequest;
 import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;

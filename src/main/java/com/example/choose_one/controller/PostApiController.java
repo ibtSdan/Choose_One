@@ -2,9 +2,9 @@ package com.example.choose_one.controller;
 
 import com.example.choose_one.common.api.Api;
 import com.example.choose_one.common.api.ApiPagination;
-import com.example.choose_one.model.ViewResponse;
-import com.example.choose_one.model.PostAllResponse;
-import com.example.choose_one.model.PostRequest;
+import com.example.choose_one.model.post.ViewResponse;
+import com.example.choose_one.model.post.PostAllResponse;
+import com.example.choose_one.model.post.PostRequest;
 import com.example.choose_one.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

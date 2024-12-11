@@ -1,9 +1,11 @@
 package com.example.choose_one.controller;
 
 import com.example.choose_one.common.api.Api;
-import com.example.choose_one.model.LoginRequest;
-import com.example.choose_one.model.LoginResponse;
-import com.example.choose_one.model.SignUpRequest;
+import com.example.choose_one.model.token.TokenResponse;
+import com.example.choose_one.model.user.LoginRequest;
+import com.example.choose_one.model.user.LoginResponse;
+import com.example.choose_one.model.user.SignUpRequest;
+import com.example.choose_one.repository.TokenRepository;
 import com.example.choose_one.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -44,7 +46,7 @@ public class UserApiController {
             @ApiResponse(responseCode = "1402",description = "Password 불일치",content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "1404",description = "User Not Found",content = @Content(mediaType = "application/json"))
     })
-    public Api<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest){
+    public Api<TokenResponse> login(@Valid @RequestBody LoginRequest loginRequest){
         return userService.login(loginRequest);
     }
 }
