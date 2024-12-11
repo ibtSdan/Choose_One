@@ -16,6 +16,7 @@ import com.example.choose_one.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -29,10 +30,10 @@ public class PostService {
     private final VoteRepository voteRepository;
 
     public Api<String> create(PostRequest postRequest) {
-        var user = userRepository.findById(postRequest.getUserId())
-                .orElseThrow(() -> {
-                    return new ApiException(UserErrorCode.USER_NOT_FOUND, "올바른 user id를 입력하십시오.");
-                });
+        var requestContext = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (Long) requestContext.getPrincipal();
+        var user = userRepository.findById(userId)
+                .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND));
 
         var entity = PostEntity.builder()
                 .user(user)
@@ -66,7 +67,9 @@ public class PostService {
         return getApiPaginationApi(list);
     }
 
-    public Api<ApiPagination<List<PostAllResponse>>> userPost(Long userId, Pageable pageable) {
+    public Api<ApiPagination<List<PostAllResponse>>> userPost(Pageable pageable) {
+        var requestContext = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (Long) requestContext.getPrincipal();
         var list = postRepository.findByUserId(userId,pageable);
         return getApiPaginationApi(list);
     }

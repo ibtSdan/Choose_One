@@ -66,12 +66,11 @@ public class PostApiController {
     }
 
     // 특정 유저 글 조회
-    @GetMapping("/view/{userId}")
+    @GetMapping("/view")
     @Operation(summary = "특정 유저 글 조회",description = "특정 유저가 작성한 글을 조회할 때 사용하는 API")
     @ApiResponse(responseCode = "200",description = "성공",content = @Content(mediaType = "application/json"))
     public Api<ApiPagination<List<PostAllResponse>>> userPost(
-            @PathVariable Long userId,
             @PageableDefault(page = 0, size = 5, sort = "id",direction = Sort.Direction.DESC)Pageable pageable){
-        return postService.userPost(userId,pageable);
+        return postService.userPost(pageable);
     }
 }

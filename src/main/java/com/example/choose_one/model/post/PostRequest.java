@@ -16,9 +16,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 
 public class PostRequest {
-    @NotNull
-    private Long userId;
-
     @NotBlank
     private String title;
 
