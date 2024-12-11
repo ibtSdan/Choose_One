@@ -17,8 +17,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class VoteRequest {
     @NotNull
-    private Long userId;
-    @NotNull
     private Long postId;
     @NotNull
     private Character voteOption;
