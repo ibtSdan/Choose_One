@@ -68,7 +68,7 @@ public class TokenHelper {
         var userId = Long.parseLong(data.get("userId").toString());
         // accessToken 재발급 위해 db 저장
         if(tokenRepository.existsByUserId(userId)){
-            var entity = tokenRepository.findById(userId)
+            var entity = tokenRepository.findByUserId(userId)
                     .orElseThrow(() -> new ApiException(TokenErrorCode.TOKEN_ERROR));
             entity.setRefreshToken(jwtToken);
             tokenRepository.save(entity);
