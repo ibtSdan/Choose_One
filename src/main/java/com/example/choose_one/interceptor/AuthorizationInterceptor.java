@@ -1,5 +1,6 @@
 package com.example.choose_one.interceptor;
 
+/*
 import com.example.choose_one.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,6 +11,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Objects;
+
+
+security 에서 jwt 검증 하므로 주석 처리
+
 
 @Component
 @RequiredArgsConstructor
@@ -24,3 +29,4 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         return true;
     }
 }
+*/
