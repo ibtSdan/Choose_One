@@ -10,18 +10,24 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+
 
 public class TokenHelper {
     @Value("${token.secret.key}")
@@ -42,6 +48,8 @@ public class TokenHelper {
         // expired
         var expiredAt = LocalDateTime.now().plusHours(accessTokenPlusHour);
         var expiredAtInstance = Date.from(expiredAt.atZone(ZoneId.systemDefault()).toInstant());
+
+
         // 토큰 생성
         var jwtToken = Jwts.builder()
                 .signWith(key)
@@ -66,6 +74,9 @@ public class TokenHelper {
                 .compact();
 
         var userId = Long.parseLong(data.get("userId").toString());
+        var authorities = data.get("authorities").toString();
+        authorities = authorities.substring(1,authorities.length()-1);
+
         // accessToken 재발급 위해 db 저장
         if(tokenRepository.existsByUserId(userId)){
             var entity = tokenRepository.findByUserId(userId)
@@ -76,6 +87,7 @@ public class TokenHelper {
             var entity = TokenEntity.builder()
                     .refreshToken(jwtToken)
                     .userId(userId)
+                    .role(authorities)
                     .build();
             tokenRepository.save(entity);
         }

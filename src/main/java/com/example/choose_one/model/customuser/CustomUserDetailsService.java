@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         var user = userRepository.findByUserId(username)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
         return new CustomUserDetails(
-                user.getId(), user.getUserId(), user.getPassword(), List.of()
+                user.getId(), user.getUserId(), user.getPassword(), user.getRole()
         );
     }
 }

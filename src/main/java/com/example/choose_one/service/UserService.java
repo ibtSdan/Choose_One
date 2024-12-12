@@ -40,6 +40,7 @@ public class UserService {
         var entity = UserEntity.builder()
                 .userId(signUpRequest.getUserId())
                 .password(encodePw)
+                .role("ROLE_USER")
                 .build();
         userRepository.save(entity);
 
@@ -61,8 +62,10 @@ public class UserService {
         var user = (CustomUserDetails) authentication.getPrincipal();
 
         var userId = user.getUserId();
-        var accessToken = tokenService.issueAccessToken(userId);
-        var refreshToken = tokenService.issueRefreshToken(userId);
+        var authorities = user.getAuthorities();
+
+        var accessToken = tokenService.issueAccessToken(userId,authorities);
+        var refreshToken = tokenService.issueRefreshToken(userId,authorities);
 
         var response = TokenResponse.builder()
                 .accessToken(accessToken.getToken())

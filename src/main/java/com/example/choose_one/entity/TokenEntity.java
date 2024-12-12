@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
 
 @Data
 @NoArgsConstructor
@@ -22,4 +25,6 @@ public class TokenEntity {
     private String refreshToken;
 
     private Long userId;
+
+    private String role;
 }

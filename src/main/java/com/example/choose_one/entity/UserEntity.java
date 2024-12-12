@@ -22,6 +22,8 @@ public class UserEntity {
 
     private String password;
 
+    private String role;
+
     @OneToMany(mappedBy = "user")
     private List<PostEntity> postList = List.of();
 
