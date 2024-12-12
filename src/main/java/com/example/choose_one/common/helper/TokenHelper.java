@@ -49,7 +49,6 @@ public class TokenHelper {
         var expiredAt = LocalDateTime.now().plusHours(accessTokenPlusHour);
         var expiredAtInstance = Date.from(expiredAt.atZone(ZoneId.systemDefault()).toInstant());
 
-
         // 토큰 생성
         var jwtToken = Jwts.builder()
                 .signWith(key)

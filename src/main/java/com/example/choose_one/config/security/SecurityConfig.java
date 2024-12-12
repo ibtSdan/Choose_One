@@ -1,5 +1,6 @@
 package com.example.choose_one.config.security;
 
+import com.example.choose_one.exceptionHandler.AccessDeniedHandler;
 import com.example.choose_one.filter.JwtAuthenticationFilter;
 import com.example.choose_one.model.customuser.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -23,22 +24,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AccessDeniedHandler accessDeniedHandler;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
                 .csrf().disable()
                 .authorizeHttpRequests(it -> {
-                    it
-                            .requestMatchers("/swagger-ui.index.html",
-                                    "/swagger-ui/**",
-                                    "/v3/api-docs/**",
-                                    "/user/signup",
-                                    "/user/login",
-                                    "/token/reissue").permitAll()
-                            .requestMatchers("/post/delete/{id}").hasAuthority("ROLE_ADMIN")
-                            .anyRequest().hasAuthority("ROLE_USER")
-                            .and()
-                            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                    try {
+                        it
+                                .requestMatchers("/swagger-ui.index.html",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/user/signup",
+                                        "/user/login",
+                                        "/token/reissue").permitAll()
+                                .requestMatchers("/post/delete/{id}").hasAuthority("ROLE_ADMIN")
+                                .anyRequest().hasAuthority("ROLE_USER")
+                                .and()
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                                .exceptionHandling(config ->
+                                        config.accessDeniedHandler(accessDeniedHandler));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 });
         return httpSecurity.build();
     }
