@@ -1,5 +1,7 @@
 package com.example.choose_one.model.customuser;
 
+import com.example.choose_one.common.error.UserErrorCode;
+import com.example.choose_one.common.exception.ApiException;
 import com.example.choose_one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user = userRepository.findByUserId(username)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND));
         return new CustomUserDetails(
                 user.getId(), user.getUserId(), user.getPassword(), user.getRole()
         );
