@@ -35,7 +35,8 @@ public class SecurityConfig {
                                     "/user/signup",
                                     "/user/login",
                                     "/token/reissue").permitAll()
-                            .anyRequest().authenticated()
+                            .requestMatchers("/post/delete/{id}").hasAuthority("ROLE_ADMIN")
+                            .anyRequest().hasAuthority("ROLE_USER")
                             .and()
                             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
                 });

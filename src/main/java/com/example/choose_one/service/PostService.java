@@ -99,4 +99,11 @@ public class PostService {
                 .build();
         return Api.OK(response);
     }
+
+    public Api<String> delete(Long id) {
+        var entity = postRepository.findById(id)
+                .orElseThrow(()-> new ApiException(PostErrorCode.POST_NOT_FOUND));
+        postRepository.delete(entity);
+        return Api.OK("삭제 완료");
+    }
 }

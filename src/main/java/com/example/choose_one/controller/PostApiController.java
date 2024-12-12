@@ -73,4 +73,14 @@ public class PostApiController {
             @PageableDefault(page = 0, size = 5, sort = "id",direction = Sort.Direction.DESC)Pageable pageable){
         return postService.userPost(pageable);
     }
+
+    @GetMapping("/delete/{id}")
+    @Operation(summary = "특정 글 삭제",description = "ADMIN이 글을 삭제 할 때 사용하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "성공",content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "2404",description = "Post Not Found", content = @Content(mediaType = "application/json"))
+    })
+    public Api<String> delete(@PathVariable Long id){
+        return postService.delete(id);
+    }
 }
