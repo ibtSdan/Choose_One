@@ -69,6 +69,10 @@ public class VoteService {
         response.put("countB", countB);
 
         // websocket으로 메세지 전송
-        simpMessagingTemplate.convertAndSend("/topic"+postId, response);
+        // /topic/postId 를 구독한 모든 클라이언트에게 메세지 전송
+        simpMessagingTemplate.convertAndSend("/topic/"+postId, response);
+
+        // 전체 글 조회에서는 실시간 모든 투표 수가 업데이트 되지 않는다.
+        // 상세 글 조회에서만 실시간으로 각 항목의 투표 수가 업데이트 된다.
     }
 }
