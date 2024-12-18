@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투표 결과</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+</head>
+<body>
+<h1>투표 결과</h1>
+<h2 id="title">목도리 색깔</h2>
+
+<div>
+    <p>아이보리: <span id="countA">0</span></p>
+    <p>네이비: <span id="countB">0</span></p>
+</div>
+
+<script>
+
+    // WebSocket Test 페이지 입니다.
+
+
+    // WebSocket 연결
+    const postId = 1;  // 예시 postId
+    const socket = new SockJS('/ws');  // 서버 WebSocket 엔드포인트
+    const stompClient = Stomp.over(socket);
+
+    // WebSocket 연결
+    stompClient.connect({}, function (frame) {
+        console.log('WebSocket 연결 성공: ' + frame);
+
+        // 특정 postId에 대한 실시간 메시지 수신
+        stompClient.subscribe('/topic/' + postId, function (messageOutput) {
+            console.log('메시지 수신:', messageOutput.body);  // 메시지 디버깅
+
+            // 메시지를 JSON으로 파싱
+            const response = JSON.parse(messageOutput.body);
+
+            // UI 업데이트 함수 호출
+            updateVoteUI(response);
+        });
+    });
+
+    // UI 업데이트 함수
+    function updateVoteUI(response) {
+        document.getElementById('countA').innerText = response.countA;
+        document.getElementById('countB').innerText = response.countB;
+    }
+</script>
+</body>
+</html>

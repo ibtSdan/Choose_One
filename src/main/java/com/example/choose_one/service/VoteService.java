@@ -11,8 +11,11 @@ import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public Api<String> create(VoteRequest voteRequest) {
         var requestContext = SecurityContextHolder.getContext().getAuthentication();
@@ -46,6 +50,29 @@ public class VoteService {
                 .voteOption(voteRequest.getVoteOption())
                 .build();
         voteRepository.save(entity);
+
+        // 실시간 투표 업데이트 및 websocket 메세지 전송
+        updateVoteCount(post.getId());
+
         return Api.OK("투표가 완료되었습니다.");
+    }
+
+    private void updateVoteCount(Long postId) {
+
+        // 투표 수 갱신
+        Long countA = voteRepository.countByPostIdAndVoteOption(postId,'A');
+        Long countB = voteRepository.countByPostIdAndVoteOption(postId, 'B');
+
+        // 메세지 데이터 담을 Map
+        var response = new HashMap<String, Long>();
+        response.put("countA", countA);
+        response.put("countB", countB);
+
+        // websocket으로 메세지 전송
+        // /topic/postId 를 구독한 모든 클라이언트에게 메세지 전송
+        simpMessagingTemplate.convertAndSend("/topic/"+postId, response);
+
+        // 전체 글 조회에서는 실시간 모든 투표 수가 업데이트 되지 않는다.
+        // 상세 글 조회에서만 실시간으로 각 항목의 투표 수가 업데이트 된다.
     }
 }
