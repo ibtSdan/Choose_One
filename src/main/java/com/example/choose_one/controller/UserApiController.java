@@ -1,16 +1,24 @@
 package com.example.choose_one.controller;
 
-import com.example.choose_one.model.LoginRequest;
-import com.example.choose_one.model.LoginResponse;
-import com.example.choose_one.model.SignUpRequest;
+import com.example.choose_one.common.api.Api;
+import com.example.choose_one.model.token.TokenResponse;
+import com.example.choose_one.model.user.LoginRequest;
+import com.example.choose_one.model.user.LoginResponse;
+import com.example.choose_one.model.user.SignUpRequest;
+import com.example.choose_one.repository.TokenRepository;
 import com.example.choose_one.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/user")
@@ -22,13 +30,31 @@ public class UserApiController {
 
     // 회원가입
     @PostMapping("/signup")
-    public String signUp(@Valid @RequestBody SignUpRequest signUpRequest){
+    @Operation(summary = "User 회원가입",description = "User 회원가입 할 때 사용하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "성공",content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "1401",description = "이미 존재하는 id", content = @Content(mediaType = "application/json"))
+    })
+    public Api<String> signUp(@Valid @RequestBody SignUpRequest signUpRequest){
         return userService.signUp(signUpRequest);
     }
 
     // 로그인
     @PostMapping("/login")
-    public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest){
+    @Operation(summary = "User 로그인",description = "User 로그인 할 때 사용하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "성공",content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "1402",description = "Password 불일치",content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "1404",description = "User Not Found",content = @Content(mediaType = "application/json"))
+    })
+    public Api<TokenResponse> login(@Valid @RequestBody LoginRequest loginRequest){
         return userService.login(loginRequest);
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "JwtToken Test",description = "토큰 유효성 검사 테스트")
+    @ApiResponse(responseCode = "200",description = "성공",content = @Content(mediaType = "application/json"))
+    public Api<String> me(){
+        return userService.me();
     }
 }

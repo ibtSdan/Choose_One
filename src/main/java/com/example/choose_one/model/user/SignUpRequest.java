@@ -1,4 +1,4 @@
-package com.example.choose_one.model;
+package com.example.choose_one.model.user;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class SignUpRequest {
 
-public class LoginRequest {
     @NotBlank
     private String userId;
 

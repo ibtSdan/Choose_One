@@ -1,15 +1,23 @@
 package com.example.choose_one.service;
 
+import com.example.choose_one.common.api.Api;
+import com.example.choose_one.common.api.ApiPagination;
+import com.example.choose_one.common.api.Pagination;
+import com.example.choose_one.common.error.PostErrorCode;
+import com.example.choose_one.common.error.UserErrorCode;
+import com.example.choose_one.common.exception.ApiException;
 import com.example.choose_one.entity.PostEntity;
-import com.example.choose_one.model.ViewResponse;
-import com.example.choose_one.model.PostAllResponse;
-import com.example.choose_one.model.PostRequest;
+import com.example.choose_one.model.post.ViewResponse;
+import com.example.choose_one.model.post.PostAllResponse;
+import com.example.choose_one.model.post.PostRequest;
 import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -21,11 +29,11 @@ public class PostService {
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
 
-    public String create(PostRequest postRequest) {
-        var user = userRepository.findById(postRequest.getUserId())
-                .orElseThrow(() -> {
-                    return new RuntimeException("Not Found User");
-                });
+    public Api<String> create(PostRequest postRequest) {
+        var requestContext = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (Long) requestContext.getPrincipal();
+        var user = userRepository.findById(userId)
+                .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND));
 
         var entity = PostEntity.builder()
                 .user(user)
@@ -34,25 +42,48 @@ public class PostService {
                 .contentB(postRequest.getContentB())
                 .build();
         postRepository.save(entity);
-        return "Post successfully created";
+        return Api.OK("글 작성 완료");
     }
 
-    public ViewResponse view(Long postId) {
+    public Api<ViewResponse> view(Long postId) {
         var entity = postRepository.findById(postId)
                 .orElseThrow(() -> {
-                    return new RuntimeException("Not Found Post");
+                    return new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.");
                 });
-        return ViewResponse.builder()
+
+        var data = ViewResponse.builder()
                 .title(entity.getTitle())
                 .contentA(entity.getContentA())
                 .contentB(entity.getContentB())
                 .countA(voteRepository.countByPostIdAndVoteOption(postId, 'A'))
                 .countB(voteRepository.countByPostIdAndVoteOption(postId, 'B'))
                 .build();
+
+        return Api.OK(data);
     }
 
-    public List<PostAllResponse> all() {
-        return postRepository.findAll().stream()
+    public Api<ApiPagination<List<PostAllResponse>>> all(Pageable pageable) {
+        var list = postRepository.findAll(pageable);
+        return getApiPaginationApi(list);
+    }
+
+    public Api<ApiPagination<List<PostAllResponse>>> userPost(Pageable pageable) {
+        var requestContext = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (Long) requestContext.getPrincipal();
+        var list = postRepository.findByUserId(userId,pageable);
+        return getApiPaginationApi(list);
+    }
+
+    private Api<ApiPagination<List<PostAllResponse>>> getApiPaginationApi(Page<PostEntity> list) {
+        // pagination
+        var pagination = Pagination.builder()
+                .page(list.getNumber())
+                .size(list.getSize())
+                .currentElements(list.getNumberOfElements())
+                .totalPage(list.getTotalPages())
+                .totalElements(list.getTotalElements())
+                .build();
+        var body = list.toList().stream()
                 .map(it -> {
                     return PostAllResponse.builder()
                             .postId(it.getId())
@@ -62,18 +93,17 @@ public class PostService {
                             .totalVotes(voteRepository.countByPostId(it.getId()))
                             .build();
                 }).toList();
+        var response = ApiPagination.<List<PostAllResponse>>builder()
+                .body(body)
+                .pagination(pagination)
+                .build();
+        return Api.OK(response);
     }
 
-    public List<PostAllResponse> userPost(Long userId) {
-        return postRepository.findByUserId(userId).stream()
-                .map(it -> {
-                    return PostAllResponse.builder()
-                            .postId(it.getId())
-                            .title(it.getTitle())
-                            .contentA(it.getContentA())
-                            .contentB(it.getContentB())
-                            .totalVotes(voteRepository.countByPostId(it.getId()))
-                            .build();
-                }).toList();
+    public Api<String> delete(Long id) {
+        var entity = postRepository.findById(id)
+                .orElseThrow(()-> new ApiException(PostErrorCode.POST_NOT_FOUND));
+        postRepository.delete(entity);
+        return Api.OK("삭제 완료");
     }
 }
