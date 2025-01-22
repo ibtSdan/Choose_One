@@ -40,6 +40,8 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger-ui.index.html",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
+                                        "/actuator",
+                                        "/actuator/**",
                                         "/", // websocket 테스트 용
                                         "/user/signup",
                                         "/user/login",
