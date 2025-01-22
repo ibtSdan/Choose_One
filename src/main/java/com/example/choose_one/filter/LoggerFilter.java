@@ -50,7 +50,7 @@ public class LoggerFilter implements Filter {
                     .append("]");
         });
         var resBody = new String(res.getContentAsByteArray());
-        log.info("<<< uri: {}, method: {}, header: {}, body: {}",uri,method,resHeaders,resBody);
+        //log.info("<<< uri: {}, method: {}, header: {}, body: {}",uri,method,resHeaders,resBody);
         res.copyBodyToResponse();
     }
 }
