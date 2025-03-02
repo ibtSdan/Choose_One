@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +84,10 @@ public class PostService {
                 .totalPage(list.getTotalPages())
                 .totalElements(list.getTotalElements())
                 .build();
+        // 투표 수를 한번에 가져오기 위한 쿼리
+        var postIds = list.stream().map(PostEntity::getId).collect(Collectors.toList());
+        var voteCountsMap = voteRepository.countVotesByPostIds(postIds);
+
         var body = list.toList().stream()
                 .map(it -> {
                     return PostAllResponse.builder()
@@ -90,7 +95,7 @@ public class PostService {
                             .title(it.getTitle())
                             .contentA(it.getContentA())
                             .contentB(it.getContentB())
-                            .totalVotes(voteRepository.countByPostId(it.getId()))
+                            .totalVotes(voteCountsMap.getOrDefault(it.getId(), 0L))
                             .build();
                 }).toList();
         var response = ApiPagination.<List<PostAllResponse>>builder()
