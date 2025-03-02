@@ -18,7 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,9 +87,17 @@ public class PostService {
                 .totalPage(list.getTotalPages())
                 .totalElements(list.getTotalElements())
                 .build();
-        // 투표 수를 한번에 가져오기 위한 쿼리
+
+        // 투표 수 한번에 가져오기
         var postIds = list.stream().map(PostEntity::getId).collect(Collectors.toList());
-        var voteCountsMap = voteRepository.countVotesByPostIds(postIds);
+        List<Object[]> voteCounts = voteRepository.countVotesByPostIds(postIds);
+
+        Map<Long, Long> voteCountsMap = new HashMap<>();
+        for (Object[] result : voteCounts) {
+            Long postId = (Long) result[0]; // postId
+            Long count = (Long) result[1];  // count vote
+            voteCountsMap.put(postId, count);
+        }
 
         var body = list.toList().stream()
                 .map(it -> {
