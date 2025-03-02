@@ -22,10 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,32 +30,28 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
+    // 인증이 필요 없는 경로
+    private final Set<String> excludePaths = new HashSet<>(Arrays.asList(
+            "/swagger-ui.index.html",
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/actuator",
+            "/actuator/**",
+            "/user/signup",
+            "/user/login",
+            "/token/reissue"
+    ));
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("필터");
-
-        // 인증이 필요 없는 경로
-        String[] excludePaths = {"/swagger-ui.index.html",
-                "/swagger-ui",
-                "/v3/api-docs",
-                "/actuator",
-                "/actuator/**",
-                "/user/signup",
-                "/user/login",
-                "/token/reissue"};
 
         String requestURI = request.getRequestURI();
 
-        boolean isExcludedPath = Arrays.stream(excludePaths)
-                .anyMatch(requestURI::startsWith);
-
-        if (isExcludedPath) {
+        if (excludePaths.stream().anyMatch(requestURI::startsWith)) {
             // 인증이 필요 없는 경로면 필터 통과
             filterChain.doFilter(request, response);
             return;
         }
-
 
         String token = request.getHeader("authorization");
         try{
