@@ -7,19 +7,13 @@ import com.example.choose_one.entity.UserEntity;
 import com.example.choose_one.model.customuser.CustomUserDetails;
 import com.example.choose_one.model.token.TokenResponse;
 import com.example.choose_one.model.user.LoginRequest;
-import com.example.choose_one.model.user.LoginResponse;
 import com.example.choose_one.model.user.SignUpRequest;
 import com.example.choose_one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +25,13 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
 
     public Api<String> signUp(SignUpRequest signUpRequest) {
-        var user = userRepository.findByUserId(signUpRequest.getUserId());
-        if(user.isPresent()){ // userId 중복 방지
-            throw new ApiException(UserErrorCode.USER_ALREADY_EXISTS, "다른 id를 입력하십시오.");
+        if (userRepository.existsByUserId(signUpRequest.getUserId())){
+            throw new ApiException(UserErrorCode.USER_ALREADY_EXISTS, "이미 존재 하는 id 입니다.");
         }
 
+        // 비밀번호 암호화
         var encodePw = passwordEncoder.encode(signUpRequest.getPassword());
+
         var entity = UserEntity.builder()
                 .userId(signUpRequest.getUserId())
                 .password(encodePw)
@@ -52,7 +47,6 @@ public class UserService {
         var authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginRequest.getUserId(), loginRequest.getPassword()
         );
-
         // authenticationManager 가 호출되면, 자동으로 authenticationProvider 호출
         // Provider 에서 설정된 UserDetailsService로 해당하는 user를 db에서 가져온다
         // 가져온 user를 match로 검증
@@ -75,11 +69,5 @@ public class UserService {
                 .build();
 
         return Api.OK(response);
-    }
-
-    public Api<String> me() {
-        var requestContext = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (Long) requestContext.getPrincipal();
-        return Api.OK("토큰 검증 완료: "+userId);
     }
 }

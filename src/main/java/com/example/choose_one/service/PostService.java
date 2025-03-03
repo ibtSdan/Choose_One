@@ -18,7 +18,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,14 +47,14 @@ public class PostService {
                 .contentB(postRequest.getContentB())
                 .build();
         postRepository.save(entity);
-        return Api.OK("글 작성 완료");
+        return Api.OK("글 작성 완료: "+entity.getId());
     }
 
     public Api<ViewResponse> view(Long postId) {
         var entity = postRepository.findById(postId)
-                .orElseThrow(() -> {
-                    return new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.");
-                });
+                .orElseThrow(() ->
+                    new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.")
+                );
 
         var data = ViewResponse.builder()
                 .title(entity.getTitle())
@@ -83,6 +88,18 @@ public class PostService {
                 .totalPage(list.getTotalPages())
                 .totalElements(list.getTotalElements())
                 .build();
+
+        // 투표 수 한번에 가져오기
+        var postIds = list.stream().map(PostEntity::getId).collect(Collectors.toList());
+        List<Object[]> voteCounts = voteRepository.countVotesByPostIds(postIds);
+
+        Map<Long, Long> voteCountsMap = new HashMap<>();
+        for (Object[] result : voteCounts) {
+            Long postId = (Long) result[0]; // postId
+            Long count = (Long) result[1];  // count vote
+            voteCountsMap.put(postId, count);
+        }
+
         var body = list.toList().stream()
                 .map(it -> {
                     return PostAllResponse.builder()
@@ -90,7 +107,7 @@ public class PostService {
                             .title(it.getTitle())
                             .contentA(it.getContentA())
                             .contentB(it.getContentB())
-                            .totalVotes(voteRepository.countByPostId(it.getId()))
+                            .totalVotes(voteCountsMap.getOrDefault(it.getId(), 0L))
                             .build();
                 }).toList();
         var response = ApiPagination.<List<PostAllResponse>>builder()
