@@ -1,4 +1,4 @@
-package com.example.choose_one.model.user;
+/*package com.example.choose_one.model.user;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -16,3 +16,4 @@ import lombok.NoArgsConstructor;
 public class LoginResponse {
     private Long id;
 }
+*/

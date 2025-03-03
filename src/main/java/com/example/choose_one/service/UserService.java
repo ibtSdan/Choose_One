@@ -7,7 +7,6 @@ import com.example.choose_one.entity.UserEntity;
 import com.example.choose_one.model.customuser.CustomUserDetails;
 import com.example.choose_one.model.token.TokenResponse;
 import com.example.choose_one.model.user.LoginRequest;
-import com.example.choose_one.model.user.LoginResponse;
 import com.example.choose_one.model.user.SignUpRequest;
 import com.example.choose_one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

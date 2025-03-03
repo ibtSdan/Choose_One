@@ -3,9 +3,7 @@ package com.example.choose_one.controller;
 import com.example.choose_one.common.api.Api;
 import com.example.choose_one.model.token.TokenResponse;
 import com.example.choose_one.model.user.LoginRequest;
-import com.example.choose_one.model.user.LoginResponse;
 import com.example.choose_one.model.user.SignUpRequest;
-import com.example.choose_one.repository.TokenRepository;
 import com.example.choose_one.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,10 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/user")
@@ -49,12 +44,5 @@ public class UserApiController {
     })
     public Api<TokenResponse> login(@Valid @RequestBody LoginRequest loginRequest){
         return userService.login(loginRequest);
-    }
-
-    @GetMapping("/me")
-    @Operation(summary = "JwtToken Test",description = "토큰 유효성 검사 테스트")
-    @ApiResponse(responseCode = "200",description = "성공",content = @Content(mediaType = "application/json"))
-    public Api<String> me(){
-        return userService.me();
     }
 }
