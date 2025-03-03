@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,14 +47,14 @@ public class PostService {
                 .contentB(postRequest.getContentB())
                 .build();
         postRepository.save(entity);
-        return Api.OK("글 작성 완료");
+        return Api.OK("글 작성 완료: "+entity.getId());
     }
 
     public Api<ViewResponse> view(Long postId) {
         var entity = postRepository.findById(postId)
-                .orElseThrow(() -> {
-                    return new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.");
-                });
+                .orElseThrow(() ->
+                    new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.")
+                );
 
         var data = ViewResponse.builder()
                 .title(entity.getTitle())
