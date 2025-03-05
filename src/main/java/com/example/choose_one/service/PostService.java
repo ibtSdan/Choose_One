@@ -14,8 +14,11 @@ import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +30,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 
 public class PostService {
-
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
+    private final VoteCacheService voteCacheService;
+    private final StringRedisTemplate redisTemplate;
 
     public Api<String> create(PostRequest postRequest) {
         var requestContext = SecurityContextHolder.getContext().getAuthentication();
@@ -56,12 +61,25 @@ public class PostService {
                     new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.")
                 );
 
+        Long countA = voteCacheService.getVoteCountFromCache(postId, 'A');
+        Long countB = voteCacheService.getVoteCountFromCache(postId, 'B');
+
+        if (countA == -1L || countB == -1L){
+            log.info("상세글 디비 접근");
+            countA = voteRepository.countByPostIdAndVoteOption(postId,'A');
+            countB = voteRepository.countByPostIdAndVoteOption(postId,'B');
+
+            // Redis 업데이트
+            voteCacheService.updateVoteCountInCache(postId,'A',countA);
+            voteCacheService.updateVoteCountInCache(postId,'B',countB);
+        }
+
         var data = ViewResponse.builder()
                 .title(entity.getTitle())
                 .contentA(entity.getContentA())
                 .contentB(entity.getContentB())
-                .countA(voteRepository.countByPostIdAndVoteOption(postId, 'A'))
-                .countB(voteRepository.countByPostIdAndVoteOption(postId, 'B'))
+                .countA(countA)
+                .countB(countB)
                 .build();
 
         return Api.OK(data);
@@ -89,15 +107,35 @@ public class PostService {
                 .totalElements(list.getTotalElements())
                 .build();
 
-        // 투표 수 한번에 가져오기
         var postIds = list.stream().map(PostEntity::getId).collect(Collectors.toList());
-        List<Object[]> voteCounts = voteRepository.countVotesByPostIds(postIds);
-
         Map<Long, Long> voteCountsMap = new HashMap<>();
-        for (Object[] result : voteCounts) {
-            Long postId = (Long) result[0]; // postId
-            Long count = (Long) result[1];  // count vote
-            voteCountsMap.put(postId, count);
+
+        // 캐시가 존재 하는 경우
+        for (Long postId : postIds) {
+            Long totalVote = voteCacheService.getVoteCountFromCache(postId);
+            if (totalVote != -1L){
+                voteCountsMap.put(postId, totalVote);
+            }
+        }
+
+        // 없는 경우
+        List<Long> postIdsNotInCache = postIds.stream()
+                .filter(postId -> !voteCountsMap.containsKey(postId))
+                .collect(Collectors.toList());
+
+        if (!postIdsNotInCache.isEmpty()) {
+            log.info("전체 디비 접근");
+            List<Object[]> voteCounts = voteRepository.countVotesByPostIds(postIdsNotInCache);
+
+            for (Object[] result : voteCounts) {
+                Long postId = (Long) result[0]; // postId
+                Long count = (Long) result[1];  // vote count
+
+                // Redis에 캐시 저장
+                voteCacheService.updateVoteCountInCache(postId,count);
+
+                voteCountsMap.put(postId, count);
+            }
         }
 
         var body = list.toList().stream()
@@ -110,6 +148,7 @@ public class PostService {
                             .totalVotes(voteCountsMap.getOrDefault(it.getId(), 0L))
                             .build();
                 }).toList();
+
         var response = ApiPagination.<List<PostAllResponse>>builder()
                 .body(body)
                 .pagination(pagination)
