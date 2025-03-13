@@ -115,7 +115,7 @@
 | **GET** | `/post/{postId}` | 세부 글 조회 & 실시간 투표 현황 확인 |
 | **POST** | `/token/reissue` | Refresh Token을 이용한 Access Token 재발급 |
 
-**"API 명세는 포트폴리오의 Swagger 캡처에서 확인 가능합니다!"**   
+**API 명세는 포트폴리오의 Swagger 캡처에서 확인 가능합니다!**   
 
 <br>
 <br>
