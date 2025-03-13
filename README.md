@@ -1,8 +1,9 @@
 # Choose One!   🆚
 ### "두 가지 선택 중 고민될 때! 실시간 투표로 빠르게 결정!"
-![image](https://github.com/user-attachments/assets/ef8b8bd7-8156-45e5-b52f-8b8ae0a98141)
+![choose_one_play](https://github.com/user-attachments/assets/2c53a82c-b068-45eb-98da-4e4250a201f0)
 <br>
 <br>
+
 <br>
 
 
