@@ -26,7 +26,7 @@
 
 - **Spring Boot + MySQL + Redis로 백엔드 구성**  
 - **Docker를 활용해 AWS EC2에서 배포 및 운영**  
-- **Prometheus & Grafana로 서비스 모니터링 구축** 🚀
+- **Prometheus & Grafana로 서비스 모니터링 구축**
 
   <br>
   <br>
