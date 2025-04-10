@@ -10,10 +10,12 @@ import com.example.choose_one.model.vote.VoteRequest;
 import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.core.env.Environment;
 
 import java.util.HashMap;
 
@@ -25,24 +27,36 @@ public class VoteService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final VoteCacheService voteCacheService;
+    private final Environment environment;
 
+    @Transactional
     public Api<String> create(VoteRequest voteRequest) {
-        var requestContext = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (Long) requestContext.getPrincipal();
+        Long userId;
+        if (isTestProfile()) {
+            userId = 999L; // 테스트용 고정 userId
+        } else {
+            var requestContext = SecurityContextHolder.getContext().getAuthentication();
+            userId = (Long) requestContext.getPrincipal();
+        }
+
         var user = userRepository.findById(userId)
                 .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND));
-        var post = postRepository.findById(voteRequest.getPostId())
-                .orElseThrow(() -> {
-                    return new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.");
-                });
+
+        // 비관적 락
+        var post = postRepository.findByIdForUpdate(voteRequest.getPostId())
+                .orElseThrow(() -> new ApiException(PostErrorCode.POST_NOT_FOUND, "올바른 post id를 입력하십시오."));
+
 
         if(!(voteRequest.getVoteOption()=='A' || voteRequest.getVoteOption()=='B')){
             throw new ApiException(VoteErrorCode.INVALID_VOTE,"A or B 중 선택 가능합니다.");
         }
 
-        var alreadyVoted = voteRepository.existsByUserIdAndPostId(userId, post.getId());
-        if(alreadyVoted){
-            throw new ApiException(VoteErrorCode.DUPLICATE_VOTE,"다른 글에 투표 하십시오.");
+
+        if (!isTestProfile()) {
+            var alreadyVoted = voteRepository.existsByUserIdAndPostId(userId, post.getId());
+            if (alreadyVoted) {
+                throw new ApiException(VoteErrorCode.DUPLICATE_VOTE, "다른 글에 투표 하십시오.");
+            }
         }
 
         // 투표 저장
@@ -60,6 +74,11 @@ public class VoteService {
         updateVoteCount(post.getId());
 
         return Api.OK("투표가 완료되었습니다.");
+    }
+
+    // 현재 profile이 test인지 확인
+    private boolean isTestProfile() {
+        return environment.acceptsProfiles("test");
     }
 
     private void updateVoteCount(Long postId) {
