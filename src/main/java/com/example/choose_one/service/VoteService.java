@@ -10,6 +10,7 @@ import com.example.choose_one.model.vote.VoteRequest;
 import com.example.choose_one.repository.PostRepository;
 import com.example.choose_one.repository.UserRepository;
 import com.example.choose_one.repository.VoteRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,7 @@ public class VoteService {
     private final VoteCacheService voteCacheService;
     private final Environment environment;
 
+    @Transactional
     public Api<String> create(VoteRequest voteRequest) {
         Long userId;
         if (isTestProfile()) {
@@ -39,10 +41,11 @@ public class VoteService {
 
         var user = userRepository.findById(userId)
                 .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND));
-        var post = postRepository.findById(voteRequest.getPostId())
-                .orElseThrow(() -> {
-                    return new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.");
-                });
+
+        // 비관적 락
+        var post = postRepository.findByIdForUpdate(voteRequest.getPostId())
+                .orElseThrow(() -> new ApiException(PostErrorCode.POST_NOT_FOUND, "올바른 post id를 입력하십시오."));
+
 
         if(!(voteRequest.getVoteOption()=='A' || voteRequest.getVoteOption()=='B')){
             throw new ApiException(VoteErrorCode.INVALID_VOTE,"A or B 중 선택 가능합니다.");
