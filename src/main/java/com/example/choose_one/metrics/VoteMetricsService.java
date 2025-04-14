@@ -15,11 +15,14 @@ public class VoteMetricsService {
     private final MeterRegistry meterRegistry;
     private final VoteRepository voteRepository;
 
-    private volatile long voteCount = 0;  // volatile 필수
+    private volatile long voteCount = 0;
 
     @Scheduled(fixedRate = 5000) // 5초마다 업데이트
     public void updateVoteCountMetric() {
-        this.voteCount = voteRepository.countByPostId(999L);
+        // post가 너무 많아지면 관리 어려움 확인
+        // 간단히 총 투표수 확인
+        // 테스트 시 특정 postId 고정 ex.999L
+        this.voteCount = voteRepository.count();
     }
 
     @PostConstruct
