@@ -48,7 +48,6 @@ public class VoteCacheService {
 
     public void updateVoteCountInCache(Long postId, Long count){
         String cacheKey = postCachePrefix + postId;
-        System.out.println("getVote: "+cacheKey);
         redisTemplate.opsForValue().set(cacheKey, String.valueOf(count));
     }
 

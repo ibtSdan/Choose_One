@@ -43,8 +43,7 @@ public class SecurityConfig {
                                         "/actuator/**",
                                         "/user/signup",
                                         "/user/login",
-                                        "/token/reissue",
-                                        "/vote/create").permitAll()
+                                        "/token/reissue").permitAll()
                                 .requestMatchers("/post/delete/{id}").hasAuthority("ROLE_ADMIN")
                                 .anyRequest().hasAuthority("ROLE_USER")
                                 .and()
