@@ -39,8 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/actuator/**",
             "/user/signup",
             "/user/login",
-            "/token/reissue",
-            "/vote/create"
+            "/token/reissue"
     ));
 
     @Override
