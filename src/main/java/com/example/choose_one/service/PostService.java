@@ -65,7 +65,6 @@ public class PostService {
         Long countB = voteCacheService.getVoteCountFromCache(postId, 'B');
 
         if (countA == -1L || countB == -1L){
-            log.info("상세글 디비 접근");
             countA = voteRepository.countByPostIdAndVoteOption(postId,'A');
             countB = voteRepository.countByPostIdAndVoteOption(postId,'B');
 
@@ -124,7 +123,6 @@ public class PostService {
                 .collect(Collectors.toList());
 
         if (!postIdsNotInCache.isEmpty()) {
-            log.info("전체 디비 접근");
             List<Object[]> voteCounts = voteRepository.countVotesByPostIds(postIdsNotInCache);
 
             for (Object[] result : voteCounts) {
