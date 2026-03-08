@@ -12,16 +12,12 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -40,7 +36,6 @@ public class TokenHelper {
     private Long refreshTokenPlusHour;
 
     private final TokenRepository tokenRepository;
-
 
     public TokenDto issueAccessToken(Map<String, Object> data){
         // key

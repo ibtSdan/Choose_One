@@ -12,7 +12,6 @@ public enum VoteErrorCode implements ErrorCodeIfs{
     DUPLICATE_VOTE(HttpStatus.BAD_REQUEST.value(), 3401, "중복투표는 허용되지 않습니다."),
     ;
 
-
     private final Integer httpStatusCode;
     private final Integer errorCode;
     private final String description;
