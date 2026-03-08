@@ -9,8 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,8 +20,6 @@ public class Api<T> {
 
     @Valid
     private T data;
-
-
 
     public static <T> Api<T> OK(T data){
         return Api.<T>builder()
