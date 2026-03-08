@@ -26,7 +26,6 @@ public class VoteService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final VoteCacheService voteCacheService;
     private final Environment environment;
 
     @Transactional
@@ -67,9 +66,6 @@ public class VoteService {
                 .build();
         voteRepository.save(entity);
 
-        // redis 투표 수 증가
-        voteCacheService.incrementVoteCountInCache(post.getId(),voteRequest.getVoteOption());
-
         // 실시간 투표 업데이트 및 websocket 메세지 전송
         updateVoteCount(post.getId());
 
@@ -83,9 +79,9 @@ public class VoteService {
 
     private void updateVoteCount(Long postId) {
 
-        // 투표 수 갱신 (Redis)
-        Long countA = voteCacheService.getVoteCountFromCache(postId,'A');
-        Long countB = voteCacheService.getVoteCountFromCache(postId, 'B');
+        // 투표 수 갱신
+        Long countA = voteRepository.countByPostIdAndVoteOption(postId, 'A');
+        Long countB = voteRepository.countByPostIdAndVoteOption(postId, 'B');
 
         // 메세지 데이터 담을 Map
         var response = new HashMap<String, Long>();

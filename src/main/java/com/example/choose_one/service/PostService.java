@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +35,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
-    private final VoteCacheService voteCacheService;
-    private final StringRedisTemplate redisTemplate;
 
     public Api<String> create(PostRequest postRequest) {
         var requestContext = SecurityContextHolder.getContext().getAuthentication();
@@ -61,17 +58,8 @@ public class PostService {
                     new ApiException(PostErrorCode.POST_NOT_FOUND,"올바른 post id를 입력하십시오.")
                 );
 
-        Long countA = voteCacheService.getVoteCountFromCache(postId, 'A');
-        Long countB = voteCacheService.getVoteCountFromCache(postId, 'B');
-
-        if (countA == -1L || countB == -1L){
-            countA = voteRepository.countByPostIdAndVoteOption(postId,'A');
-            countB = voteRepository.countByPostIdAndVoteOption(postId,'B');
-
-            // Redis 업데이트
-            voteCacheService.updateVoteCountInCache(postId,'A',countA);
-            voteCacheService.updateVoteCountInCache(postId,'B',countB);
-        }
+        Long countA = voteRepository.countByPostIdAndVoteOption(postId,'A');
+        Long countB = voteRepository.countByPostIdAndVoteOption(postId,'B');
 
         var data = ViewResponse.builder()
                 .title(entity.getTitle())
@@ -108,32 +96,12 @@ public class PostService {
 
         var postIds = list.stream().map(PostEntity::getId).collect(Collectors.toList());
         Map<Long, Long> voteCountsMap = new HashMap<>();
+        List<Object[]> voteCounts = voteRepository.countVotesByPostIds(postIds);
 
-        // 캐시가 존재 하는 경우
-        for (Long postId : postIds) {
-            Long totalVote = voteCacheService.getVoteCountFromCache(postId);
-            if (totalVote != -1L){
-                voteCountsMap.put(postId, totalVote);
-            }
-        }
-
-        // 없는 경우
-        List<Long> postIdsNotInCache = postIds.stream()
-                .filter(postId -> !voteCountsMap.containsKey(postId))
-                .collect(Collectors.toList());
-
-        if (!postIdsNotInCache.isEmpty()) {
-            List<Object[]> voteCounts = voteRepository.countVotesByPostIds(postIdsNotInCache);
-
-            for (Object[] result : voteCounts) {
-                Long postId = (Long) result[0]; // postId
-                Long count = (Long) result[1];  // vote count
-
-                // Redis에 캐시 저장
-                voteCacheService.updateVoteCountInCache(postId,count);
-
-                voteCountsMap.put(postId, count);
-            }
+        for (Object[] result : voteCounts) {
+            Long postId = (Long) result[0]; // postId
+            Long count = (Long) result[1];  // vote count
+            voteCountsMap.put(postId, count);
         }
 
         var body = list.toList().stream()
