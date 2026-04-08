@@ -38,7 +38,7 @@ jobs:
             pkill -f 'java -jar' || true
 
             echo "Starting new application..."
-            nohup java -jar build/libs/*.jar > app.log 2>&1 &
+            nohup java -jar build/libs/*.jar \ --spring.config.location=~/app/config/application.yml \ > app.log 2>&1 &
 
             echo "Deployment complete!"
           EOF
