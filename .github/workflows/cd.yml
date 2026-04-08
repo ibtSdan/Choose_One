@@ -28,6 +28,7 @@ jobs:
 
             cd ~/app/Choose_One
 
+
             echo "Pulling latest code..."
             git pull origin main
 
@@ -38,7 +39,7 @@ jobs:
             pkill -f 'java -jar' || true
 
             echo "Starting new application..."
-            nohup java -jar build/libs/choose_one-0.0.1-SNAPSHOT.jar &
+            nohup java -jar build/libs/choose_one-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 
             echo "Deployment complete!"
           EOF
