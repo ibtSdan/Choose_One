@@ -28,6 +28,7 @@ jobs:
 
             cd ~/app/Choose_One
 
+
             echo "Pulling latest code..."
             git pull origin main
 
