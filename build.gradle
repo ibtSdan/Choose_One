@@ -54,5 +54,5 @@ tasks.named('test') {
 }
 
 tasks.named('bootJar') {
-	mainClass.set("com.example.chat.ChatApplication") // 실제 main 클래스 경로
+	mainClass.set("com.example.chat.ChooseOneApplication") // 실제 main 클래스 경로
 }
