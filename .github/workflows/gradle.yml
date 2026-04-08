@@ -23,7 +23,8 @@ jobs:
       - name: Create test application.yml
         run: |
           mkdir -p src/test/resources
-          echo "spring:
+          cat <<EOF > src/test/resources/application.yml
+spring:
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
@@ -37,13 +38,14 @@ jobs:
     console:
       enabled: true
 
-  token:
-    secret:
-      key: '${{ secrets.TEST_TOKEN_KEY }}'
-    access-token:
-      plus-hour: 1
-    refresh-token:
-      plus-hour: 24" > src/test/resources/application.yml
+token:
+  secret:
+    key: "${{ secrets.TEST_TOKEN_KEY }}"
+  access-token:
+    plus-hour: 1
+  refresh-token:
+    plus-hour: 24
+EOF
 
       - name: Build and test
         run: ./gradlew build -Dspring.profiles.active=test
