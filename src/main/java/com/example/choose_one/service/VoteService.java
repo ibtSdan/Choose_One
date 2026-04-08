@@ -26,17 +26,12 @@ public class VoteService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final Environment environment;
 
     @Transactional
     public Api<String> create(VoteRequest voteRequest) {
         Long userId;
-        if (isTestProfile()) {
-            userId = 999L; // 테스트용 고정 userId
-        } else {
-            var requestContext = SecurityContextHolder.getContext().getAuthentication();
+        var requestContext = SecurityContextHolder.getContext().getAuthentication();
             userId = (Long) requestContext.getPrincipal();
-        }
 
         var user = userRepository.findById(userId)
                 .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND));
@@ -51,11 +46,9 @@ public class VoteService {
         }
 
 
-        if (!isTestProfile()) {
-            var alreadyVoted = voteRepository.existsByUserIdAndPostId(userId, post.getId());
-            if (alreadyVoted) {
-                throw new ApiException(VoteErrorCode.DUPLICATE_VOTE, "다른 글에 투표 하십시오.");
-            }
+        var alreadyVoted = voteRepository.existsByUserIdAndPostId(userId, post.getId());
+        if (alreadyVoted) {
+            throw new ApiException(VoteErrorCode.DUPLICATE_VOTE, "다른 글에 투표 하십시오.");
         }
 
         // 투표 저장
@@ -70,11 +63,6 @@ public class VoteService {
         updateVoteCount(post.getId());
 
         return Api.OK("투표가 완료되었습니다.");
-    }
-
-    // 현재 profile이 test인지 확인
-    private boolean isTestProfile() {
-        return environment.acceptsProfiles("test");
     }
 
     private void updateVoteCount(Long postId) {

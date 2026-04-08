@@ -45,7 +45,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = request.getHeader("authorization");
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
         try{
             var map = tokenService.validationToken(token);
             var userId = Long.parseLong(map.get("userId").toString());
