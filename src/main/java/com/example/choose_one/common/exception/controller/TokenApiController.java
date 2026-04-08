@@ -1,16 +1,13 @@
-package com.example.choose_one.controller;
+package com.example.choose_one.common.exception.controller;
 
 import com.example.choose_one.common.api.Api;
 import com.example.choose_one.model.token.RefreshTokenRequest;
 import com.example.choose_one.model.token.TokenDto;
-import com.example.choose_one.model.token.TokenResponse;
-import com.example.choose_one.model.user.LoginRequest;
 import com.example.choose_one.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

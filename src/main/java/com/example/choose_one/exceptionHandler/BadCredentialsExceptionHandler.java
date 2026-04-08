@@ -1,7 +1,6 @@
 package com.example.choose_one.exceptionHandler;
 
 import com.example.choose_one.common.api.Api;
-import com.example.choose_one.common.error.ErrorCode;
 import com.example.choose_one.common.error.UserErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

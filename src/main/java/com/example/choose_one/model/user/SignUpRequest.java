@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SignUpRequest {
 
+public class SignUpRequest {
     @NotBlank
     private String userId;
 

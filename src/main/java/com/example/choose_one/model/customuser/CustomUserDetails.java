@@ -15,14 +15,9 @@ import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
     private Long userId;
-
     private String username;
-
     private String encodePw;
-
     private String role;
-
-
 
     public Long getUserId() {
         return userId;
