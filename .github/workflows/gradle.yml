@@ -29,28 +29,28 @@ jobs:
       run: |
         mkdir -p src/test/resources
         cat <<EOF > src/test/resources/application.yml
-spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-  h2:
-    console:
-      enabled: true
+        spring:
+          datasource:
+            url: jdbc:h2:mem:testdb
+            driver-class-name: org.h2.Driver
+            username: sa
+            password:
+          jpa:
+            database-platform: org.hibernate.dialect.H2Dialect
+            hibernate:
+              ddl-auto: create-drop
+          h2:
+            console:
+              enabled: true
 
-token:
-  secret:
-    key: "${{ secrets.TEST_TOKEN_KEY }}"
-  access-token:
-    plus-hour: 1
-  refresh-token:
-    plus-hour: 24
-EOF
+        token:
+          secret:
+            key: "${{ secrets.TEST_TOKEN_KEY }}"
+          access-token:
+            plus-hour: 1
+          refresh-token:
+            plus-hour: 24
+        EOF
 
     - name: Build with Gradle Wrapper
       run: ./gradlew build
