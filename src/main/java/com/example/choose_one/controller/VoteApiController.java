@@ -1,4 +1,4 @@
-package com.example.choose_one.common.exception.controller;
+package com.example.choose_one.controller;
 
 import com.example.choose_one.common.api.Api;
 import com.example.choose_one.model.vote.VoteRequest;
