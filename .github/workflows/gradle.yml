@@ -45,7 +45,7 @@ token:
     plus-hour: 1
   refresh-token:
     plus-hour: 24
-EOF
+      EOF
 
       - name: Build and test
         run: ./gradlew build -Dspring.profiles.active=test
