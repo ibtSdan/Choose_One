@@ -1,6 +1,7 @@
 package com.example.choose_one.controller;
 
 import com.example.choose_one.common.api.Api;
+import com.example.choose_one.component.VoteFacade;
 import com.example.choose_one.model.vote.VoteRequest;
 import com.example.choose_one.service.VoteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class VoteApiController {
     private final VoteService voteService;
+    private final VoteFacade voteFacade;
 
     @PostMapping("/create")
     @Operation(summary = "투표하기",description = "User가 투표할 때 사용하는 API")
@@ -31,7 +33,8 @@ public class VoteApiController {
     })
     @Parameter(name = "voteOption",description = "A or B")
     public Api<String> create(@Valid @RequestBody VoteRequest voteRequest){
-        return voteService.create(voteRequest);
+        //return voteService.create(voteRequest);
+        return voteFacade.voteWithOptimisticLock(voteRequest);
     }
 
 }
