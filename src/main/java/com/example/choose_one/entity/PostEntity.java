@@ -29,6 +29,12 @@ public class PostEntity {
     @ToString.Exclude
     private UserEntity user;
 
+    @Column(nullable = false)
+    private Long voteCountA = 0L;
+
+    @Column(nullable = false)
+    private Long voteCountB = 0L;
+
     @OneToMany(mappedBy = "post")
     private List<VoteEntity> voteList = List.of();
 
