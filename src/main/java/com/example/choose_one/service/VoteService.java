@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.core.env.Environment;
 
@@ -63,6 +64,14 @@ public class VoteService {
                 .voteOption(voteRequest.getVoteOption())
                 .build();
         voteRepository.save(entity);
+
+        if (voteRequest.getVoteOption() == 'A') {
+            post.setVoteCountA(post.getVoteCountA() + 1);
+        } else {
+            post.setVoteCountB(post.getVoteCountB() + 1);
+        }
+
+        postRepository.save(post);
 
         // 실시간 투표 업데이트 및 websocket 메세지 전송
         updateVoteCount(post.getId());
