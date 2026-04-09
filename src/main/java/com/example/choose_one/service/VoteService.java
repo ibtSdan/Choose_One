@@ -44,13 +44,19 @@ public class VoteService {
          */
 
         // 비관적 락
+        /*
         var post = postRepository.findByIdForUpdate(voteRequest.getPostId())
                 .orElseThrow(() -> new ApiException(PostErrorCode.POST_NOT_FOUND, "올바른 post id를 입력하십시오."));
+         */
+
+        // 낙관적 락
+        var post = postRepository.findByIdOptimistic(voteRequest.getPostId())
+                .orElseThrow(() -> new ApiException(PostErrorCode.POST_NOT_FOUND, "올바른 post id를 입력하십시오."));
+
 
         if(!(voteRequest.getVoteOption()=='A' || voteRequest.getVoteOption()=='B')){
             throw new ApiException(VoteErrorCode.INVALID_VOTE,"A or B 중 선택 가능합니다.");
         }
-
 
         var alreadyVoted = voteRepository.existsByUserIdAndPostId(userId, post.getId());
         if (alreadyVoted) {
