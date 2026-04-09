@@ -38,4 +38,6 @@ public class PostEntity {
     @OneToMany(mappedBy = "post")
     private List<VoteEntity> voteList = List.of();
 
+    @Version
+    private Long version;
 }

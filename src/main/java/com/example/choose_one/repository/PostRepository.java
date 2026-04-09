@@ -23,6 +23,11 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
     @Query("SELECT p FROM post p WHERE p.id = :id")
     Optional<PostEntity> findByIdForUpdate(@Param("id") Long id);
 
+    // 낙관적 락
+    @Lock(LockModeType.OPTIMISTIC)
+    @Query("SELECT p FROM post p WHERE p.id = :id")
+    Optional<PostEntity> findByIdOptimistic(@Param("id") Long id);
+
 
     @Query("SELECT p.id FROM post p")
     List<Long> findAllPostIds();
