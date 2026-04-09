@@ -69,7 +69,7 @@ public class VoteService {
                 .post(post)
                 .voteOption(voteRequest.getVoteOption())
                 .build();
-        voteRepository.save(entity);
+        //voteRepository.save(entity);
 
         if (voteRequest.getVoteOption() == 'A') {
             post.setVoteCountA(post.getVoteCountA() + 1);
