@@ -15,9 +15,14 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
     Page<PostEntity> findByUserId(Long userId, Pageable pageable);
 
+    // 락 X
+    Optional<PostEntity> findById(Long id);
+
+    // 비관적 락
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM post p WHERE p.id = :id")
     Optional<PostEntity> findByIdForUpdate(@Param("id") Long id);
+
 
     @Query("SELECT p.id FROM post p")
     List<Long> findAllPostIds();

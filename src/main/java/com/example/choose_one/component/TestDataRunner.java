@@ -59,7 +59,7 @@ public class TestDataRunner implements CommandLineRunner{
             var accessToken = tokenService.issueAccessToken(userId, authorities);
 
             // CSV 파일에 기록
-            writer.write(String.valueOf(accessToken.getToken()));
+            writer.write(accessToken.getToken());
             writer.newLine();
         }
         writer.close();
