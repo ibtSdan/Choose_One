@@ -11,7 +11,8 @@ public enum ErrorCode implements ErrorCodeIfs{
     OK(HttpStatus.OK.value(), 200,"성공"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST.value(),400,"잘못된 요청"),
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), 500, "서버 에러"),
-    NULL_POINT(HttpStatus.INTERNAL_SERVER_ERROR.value(), 512,"Null Point")
+    NULL_POINT(HttpStatus.INTERNAL_SERVER_ERROR.value(), 512,"Null Point"),
+    LOCK_FAILED(HttpStatus.BAD_REQUEST.value(), 513, "잠시 후 다시 시도해주세요.");
     ;
 
     private final Integer httpStatusCode;

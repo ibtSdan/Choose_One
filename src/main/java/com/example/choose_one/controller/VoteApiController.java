@@ -34,7 +34,7 @@ public class VoteApiController {
     @Parameter(name = "voteOption",description = "A or B")
     public Api<String> create(@Valid @RequestBody VoteRequest voteRequest){
         //return voteService.create(voteRequest);
-        return voteFacade.voteWithOptimisticLock(voteRequest);
+        return voteFacade.voteWithDistributedLock(voteRequest);
     }
 
 }
