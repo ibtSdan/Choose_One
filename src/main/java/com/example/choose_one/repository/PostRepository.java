@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
     Page<PostEntity> findByUserId(Long userId, Pageable pageable);
 
-    // 락 X
+    // 락 X or 분산 락
     Optional<PostEntity> findById(Long id);
 
     // 비관적 락
