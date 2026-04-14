@@ -14,6 +14,12 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -42,6 +48,11 @@ jobs:
           h2:
             console:
               enabled: true
+          
+          data:
+            redis:
+              host: localhost
+              port: 6379
 
         token:
           secret:
@@ -50,12 +61,6 @@ jobs:
             plus-hour: 1
           refresh-token:
             plus-hour: 24
-        
-        services:
-          redis:
-            image: redis
-            ports:
-              - 6379:6379
         EOF
 
     - name: Build with Gradle Wrapper
