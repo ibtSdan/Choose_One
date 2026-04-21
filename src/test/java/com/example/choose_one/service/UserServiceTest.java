@@ -1,16 +1,13 @@
 package com.example.choose_one.service;
 
-import com.example.choose_one.common.api.Api;
 import com.example.choose_one.common.error.UserErrorCode;
 import com.example.choose_one.common.exception.ApiException;
 import com.example.choose_one.entity.UserEntity;
 import com.example.choose_one.model.customuser.CustomUserDetails;
 import com.example.choose_one.model.token.TokenDto;
-import com.example.choose_one.model.token.TokenResponse;
 import com.example.choose_one.model.user.LoginRequest;
 import com.example.choose_one.model.user.SignUpRequest;
 import com.example.choose_one.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,11 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,9 +39,6 @@ public class UserServiceTest {
 
     @Mock
     private TokenService tokenService;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
 
     @Nested
     class 회원가입_테스트 {
